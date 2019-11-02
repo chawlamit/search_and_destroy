@@ -5,6 +5,7 @@ class Terrain():
         self.name = name
         self.p_false_neg = p_false_neg
 
+
     @classmethod
     def generate_flat(cls):
         return cls('flat', 0.1)
@@ -25,6 +26,7 @@ class Terrain():
     def generate_from_index(cls, i):
         f = getattr(cls, "generate_"+cls.T_names[i])
         return f()
+
 
     def __repr__(self):
         return self.name

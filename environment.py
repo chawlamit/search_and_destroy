@@ -10,6 +10,7 @@ class Environment() :
         self.p_forest = p_forest
         self.p_cave = p_cave
         self._create_board()
+        self.target = self._place_target()
 
     def _create_board(self):
         self._board = np.array([ [None]*self.dim for _ in range(self.dim) ])
@@ -22,6 +23,20 @@ class Environment() :
                     sample = np.random.randint(0, 4 )
                 multinomial_sample[0,sample] -= 1
                 self._board[i,j] = Terrain.generate_from_index(sample)
+
+    def _place_target(self):
+        target = np.random.randint(0, self.dim ** 2 + 1)
+        row, col = target // self.dim, target % self.dim
+        return row, col
+
+    def search(self, row, col):
+        if (row, col) != self.target:
+            return False
+        p = self._board[row,col].p_false_neg
+        if np.random.binomial(1,1-p,1):
+            return True
+        else:
+            return False
 
     def show(self):
         for row in self._board :
