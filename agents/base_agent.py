@@ -1,17 +1,34 @@
 from environment import Environment
 from abc import ABC, abstractmethod
-
+from terrain import Terrain
+import math
 
 class BaseAgent(ABC):
-    def __init__(self,env:Environment):
+    def __init__(self, env: Environment):
         self.env = env
         self.search_count = 0
-        self._belief = [[(1 / self.env.dim ** 2, (i, j)) for j in range(env.dim)] for i in range(env.dim)]
+        self.travel_count = 0
+
+        initial_belief = 1 / self.env.dim ** 2
+        self._belief = [[initial_belief for j in range(env.dim)] for i in range(env.dim)]
+        self.max_belief = initial_belief
 
     @abstractmethod
     def run(self):
         pass
 
-    def search(self):
+    def search(self, row, col):
         self.search_count += 1
-        return self.env.search()
+        return self.env.search(row, col)
+
+    def show(self):
+        for row in self._belief:
+            print(row)
+
+    @staticmethod
+    def manhattan(current, dest):
+        return math.fabs(current[0] - dest[0]) + math.fabs(current[1] - dest[1])
+
+    def total_actions(self):
+        return self.search_count + self.travel_count
+

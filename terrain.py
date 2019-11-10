@@ -1,10 +1,11 @@
-class Terrain():
+class Terrain:
+
     T_names = ["flat", "hilly", "forest", "cave"]
 
     def __init__(self, name, p_false_neg):
         self.name = name
+        # P(Target not found | target in cell)
         self.p_false_neg = p_false_neg
-
 
     @classmethod
     def generate_flat(cls):
@@ -26,7 +27,6 @@ class Terrain():
     def generate_from_index(cls, i):
         f = getattr(cls, "generate_"+cls.T_names[i])
         return f()
-
 
     def __repr__(self):
         return self.name
