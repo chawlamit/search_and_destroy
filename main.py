@@ -11,10 +11,10 @@ agent = BayesianAgentRule1(env)
 agent.run()
 print(f"{agent.__class__}: Search Count - {agent.search_count}, Total Actions - {agent.total_actions()}")
 #
-agent = BayesianAgentRule2(env)
-agent.run()
-print(f"{agent.__class__}: Search Count - {agent.search_count}, Total Actions - {agent.total_actions()}")
-#
-agent = MinActionAgent(env)
-agent.run()
-print(f"{agent.__class__}: Search Count - {agent.search_count}, Total Actions - {agent.total_actions()}")
+# agent = BayesianAgentRule2(env)
+# agent.run()
+# print(f"{agent.__class__}: Search Count - {agent.search_count}, Total Actions - {agent.total_actions()}")
+# #
+# agent = MinActionAgent(env)
+# agent.run()
+# print(f"{agent.__class__}: Search Count - {agent.search_count}, Total Actions - {agent.total_actions()}")

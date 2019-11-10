@@ -36,7 +36,6 @@ class BayesianAgentRule1(BaseAgent):
         self.travel_count += distance
         return dest
 
-
     def run(self):
         prev_cell = (0, 0)
         while True:
@@ -56,7 +55,9 @@ class BayesianAgentRule1(BaseAgent):
                     self.update((i, j), current, prior, terrain.p_false_neg)
                     if self._belief[i][j] > self.max_belief:
                         self.max_belief = self._belief[i][j]
+
             prev_cell = current
+            self.update_visualization(*current)
 
 
 class BayesianAgentRule2(BayesianAgentRule1):

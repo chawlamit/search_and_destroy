@@ -1,7 +1,10 @@
 from environment import Environment
-from abc import ABC, abstractmethod
 from terrain import Terrain
+from visualization import SearchAndDestroy
+
+from abc import ABC, abstractmethod
 import math
+import matplotlib.pyplot as plt
 
 class BaseAgent(ABC):
     def __init__(self, env: Environment):
@@ -12,6 +15,11 @@ class BaseAgent(ABC):
         initial_belief = 1 / self.env.dim ** 2
         self._belief = [[initial_belief for j in range(env.dim)] for i in range(env.dim)]
         self.max_belief = initial_belief
+
+        # visualization
+        self.visualization = SearchAndDestroy(env)
+        self.visualization.show()
+
 
     @abstractmethod
     def run(self):
@@ -24,6 +32,9 @@ class BaseAgent(ABC):
     def show(self):
         for row in self._belief:
             print(row)
+
+    def update_visualization(self, row, col):
+        self.visualization.update(row, col, self._belief[row][col])
 
     @staticmethod
     def manhattan(current, dest):
