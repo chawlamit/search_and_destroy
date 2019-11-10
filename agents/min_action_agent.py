@@ -1,5 +1,5 @@
 import math
-from .bayesian_agent import BayesianAgentRule1
+from .bayesian_agent_rule1 import BayesianAgentRule1
 
 
 class MinActionAgent(BayesianAgentRule1):
