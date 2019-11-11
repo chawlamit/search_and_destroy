@@ -1,6 +1,6 @@
 from .base_agent import BaseAgent
 import random
-
+import numpy as np
 class BayesianAgentRule1(BaseAgent):
     """
     Using bayesian update to update the belief of Ta = Ci for every cell on board given the data we observed i.e. T != Ci
@@ -9,7 +9,6 @@ class BayesianAgentRule1(BaseAgent):
     Baysian Update: P(Ta = Ci / data) => P(Ta = Ci and data) / P(data)
     """
 
-    #TODO - normalize probability after each update cycle
     def P_data(self, prior, p_false_neg):
         # P(T != Cj) = { P(Ta = Cj) X P(T != Cj)   +  P(Ta != Cj) X P(T != Cj)
         #                 Prior     X P_false_neg  +  (1 - Prior) X 1
@@ -55,10 +54,13 @@ class BayesianAgentRule1(BaseAgent):
                     self.update((i, j), current, prior, terrain.p_false_neg)
                     if self._belief[i][j] > self.max_belief:
                         self.max_belief = self._belief[i][j]
-
-
-
+            # Normalize the probability values
+            total_prob = np.sum(self._belief)
+            self._belief /= total_prob
+            self.max_belief /= total_prob
+            # prev cell searched -> used for pick_next
             prev_cell = current
+            # Update the visualization matrix
             self.update_visualization(*current)
 
 

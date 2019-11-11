@@ -29,19 +29,17 @@ class SearchAndDestroy(object):
     edge_color = '#888888'
     count_colors = ['none', 'blue', 'green', 'red', 'darkblue',
                     'darkred', 'darkgreen', 'black', 'black']
-    flag_vertices = np.array([[0.25, 0.2], [0.25, 0.8],
-                              [0.75, 0.65], [0.25, 0.5]])
 
-    def __init__(self, env: Environment):
+    def __init__(self, env: Environment, belief):
         self.env = env
+        self.belief = belief
         self.width = self.env.dim
         self.height = self.env.dim
         self.target = self.env.target
         self.open_count = np.zeros((self.env.dim, self.env.dim))
-
+        self.ann_ref = [[None] * self.env.dim for _ in range(self.env.dim)]
         # define internal state variables
         self.flags = np.zeros((self.width, self.height), dtype=object)
-
 
         # generate figure
         plt.figure(figsize=((self.width + 2) / 3., (self.height + 2) / 3.))
@@ -50,8 +48,13 @@ class SearchAndDestroy(object):
         self.generate_fig(self.ax[0])
         self.generate_fig(self.ax[1])
 
-        # self.ax2 = self.generate_fig(ax[1])
-        self.game_over = False
+        # show belief on annotation
+        self.annot_belief = self.ax[1].annotate("", xy=(0, 0), xytext=(20, 20), textcoords="offset points",
+                            bbox=dict(boxstyle="round", fc="w"),
+                            arrowprops=dict(arrowstyle="->"))
+        self.annot_belief.set_visible(False)
+
+        self.fig.canvas.mpl_connect('motion_notify_event', self.show_belief)
 
     def generate_fig(self, ax):
         ax_loc = (0.05, 0.05, 0.9, 0.9)
@@ -60,6 +63,7 @@ class SearchAndDestroy(object):
         ax.set_xlim(-ax_loc[0], width + ax_loc[0])
         ax.set_ylim(-ax_loc[1], height + ax_loc[1])
         ax.set_aspect('equal')
+        ax.invert_yaxis()
 
         for axis in (ax.xaxis, ax.yaxis):
             axis.set_major_formatter(plt.NullFormatter())
@@ -72,8 +76,8 @@ class SearchAndDestroy(object):
                                                  orientation=np.pi / 4,
                                                  ec=self.edge_color,
                                                  fc=self.color_map[self.env.get_terrain(i, j).name])
-                                  for i in range(height)]
-                                 for j in range(width)])
+                                  for j in range(width)]
+                                 for i in range(height)])
 
         [ax.add_patch(sq) for sq in squares.flat]
         # map(self.ax.add_path, self.squares.flat)
@@ -102,13 +106,26 @@ class SearchAndDestroy(object):
             self._draw_target(self.ax[1], i, j)
 
         if self.open_count[i, j] > 1:
-            self.ax[1].text(i + 0.5, j + 0.5, int(self.open_count[i, j]),
-                            color="yellow", ha='center', va='center', fontsize=10,
-                            fontweight='bold')
-
+            if self.ann_ref[i][j] is None:
+                self.ann_ref[i][j] = self.ax[1].annotate(int(self.open_count[i, j]), (i + 0.5, j + 0.5),
+                                color="yellow", ha='center', va='center', fontsize=10,
+                                fontweight='bold')
+            else:
+                self.ann_ref[i][j].set_text(int(self.open_count[i, j]))
         self.fig.canvas.draw()
         plt.pause(0.2)
         # input()
+
+    def show_belief(self, event):
+        try:
+            x = int(event.xdata)
+            y = int(event.ydata)
+            if event.inaxes == self.ax[1]:
+                self.annot_belief.set_text(round(self.belief[x, y], 4))
+                self.annot_belief.xy = (x + 0.5, y + 0.5)
+                self.annot_belief.set_visible(True)
+        except Exception as e:
+            self.annot_belief.set_visible(False)
 
     def show(self):
         plt.ion()

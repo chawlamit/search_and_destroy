@@ -20,7 +20,7 @@ class BaseAgent(ABC):
         # visualization
         self.visualize = visualize
         if visualize:
-            self.visualization = SearchAndDestroy(env)
+            self.visualization = SearchAndDestroy(env, self._belief)
             self.visualization.show()
 
     @abstractmethod

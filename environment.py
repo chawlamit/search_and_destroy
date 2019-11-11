@@ -25,10 +25,10 @@ class Environment:
                 self._board[i, j] = Terrain.generate_from_index(sample)
 
     def _place_target(self, terrain):
-        target = np.random.randint(0, self.dim ** 2 + 1)
+        target = np.random.randint(0, self.dim ** 2)
         row, col = target // self.dim, target % self.dim
 
-        if terrain == "random":
+        if terrain == "random" or terrain not in Terrain.T_names:
             pass
         else:
             while self.get_terrain(row, col).name != terrain:
