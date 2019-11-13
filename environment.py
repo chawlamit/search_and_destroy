@@ -1,4 +1,5 @@
 from terrain import Terrain
+import random
 import numpy as np
 
 
@@ -10,6 +11,8 @@ class Environment:
         self.p_forest = p_forest
         self.p_cave = p_cave
         self._create_board()
+        # Place the target
+        self.target = None
         self.place_target(place_target_in)
 
     def _create_board(self):
@@ -32,7 +35,7 @@ class Environment:
                 self._board[i][j] = f()
 
     def place_target(self, terrain):
-        target = np.random.randint(0, self.dim ** 2)
+        target = np.random.randint(0, (self.dim ** 2) - 1)
         row, col = target // self.dim, target % self.dim
 
         if terrain == "random" or terrain not in Terrain.T_names:
@@ -53,6 +56,7 @@ class Environment:
         else:
             return False
 
+    # Helper Funcs
     def get_terrain(self, row, col):
         return self._board[row, col]
 
@@ -61,6 +65,20 @@ class Environment:
             print(row)
         print()
 
+    def get_neighbors(self, row, col):
+        """
+        :return: List of neighbours out of the 4 valid neighbours
+        """
+        nbs = []
+        if 0 <= row - 1 < self.dim and 0 <= col < self.dim:
+            nbs.append((row-1, col))
+        if 0 <= row + 1 < self.dim and 0 <= col < self.dim:
+            nbs.append((row+1, col))
+        if 0 <= row < self.dim and 0 <= col - 1 < self.dim:
+            nbs.append((row, col-1))
+        if 0 <= row < self.dim and 0 <= col + 1 < self.dim:
+            nbs.append((row, col+1))
+        return nbs
 
 
 

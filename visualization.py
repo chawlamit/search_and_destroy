@@ -30,9 +30,10 @@ class SearchAndDestroy(object):
     count_colors = ['none', 'blue', 'green', 'red', 'darkblue',
                     'darkred', 'darkgreen', 'black', 'black']
 
-    def __init__(self, env: Environment, belief):
+    def __init__(self, env: Environment, belief, delay=0.2):
         self.env = env
         self.belief = belief
+        self.delay = delay
         self.width = self.env.dim
         self.height = self.env.dim
         self.target = self.env.target
@@ -71,13 +72,13 @@ class SearchAndDestroy(object):
 
         # Create the grid of squares
         squares = np.array([[RegularPolygon((i + 0.5, j + 0.5),
-                                                 numVertices=4,
-                                                 radius=0.5 * np.sqrt(2),
-                                                 orientation=np.pi / 4,
-                                                 ec=self.edge_color,
-                                                 fc=self.color_map[self.env.get_terrain(i, j).name])
-                                  for j in range(width)]
-                                 for i in range(height)])
+                                            numVertices=4,
+                                            radius=0.5 * np.sqrt(2),
+                                            orientation=np.pi / 4,
+                                            ec=self.edge_color,
+                                            fc=self.color_map[self.env.get_terrain(i, j).name])
+                                for j in range(width)]
+                            for i in range(height)])
 
         [ax.add_patch(sq) for sq in squares.flat]
         # map(self.ax.add_path, self.squares.flat)
@@ -86,8 +87,21 @@ class SearchAndDestroy(object):
         self._draw_target(ax, *target)
 
     def _draw_target(self, ax, i, j):
+        # clear prev_target for movingTarget
+        if hasattr(self.env, 'prev_target') and self.env.prev_target is not None:
+            if self.open_count[self.env.prev_target[0], self.env.prev_target[1]] > 0:
+                color = self.open_color_map[self.env.get_terrain(*self.env.prev_target).name]
+            else:
+                color = self.color_map[self.env.get_terrain(*self.env.prev_target).name]
+            ax.add_patch(RegularPolygon((self.env.prev_target[0] + 0.5, self.env.prev_target[1] + 0.5),
+                                        numVertices=4,
+                                        radius=0.5 * np.sqrt(2),
+                                        orientation=np.pi / 4,
+                                        ec=self.edge_color,
+                                        fc=color))
+        # draw target
         ax.add_patch(plt.Circle((i + 0.5, j + 0.5), radius=0.25,
-                                     ec='black', fc='red'))
+                                ec='black', fc='red'))
 
     def update(self, i, j, belief):
         # checking bounds
@@ -102,18 +116,18 @@ class SearchAndDestroy(object):
                                             ec=self.edge_color,
                                             fc=self.open_color_map[self.env.get_terrain(i, j).name])
                              )
-        if (i, j) == self.env.target:
-            self._draw_target(self.ax[1], i, j)
+        # if (i, j) == self.env.target:
+        self._draw_target(self.ax[1], *self.env.target)
 
         if self.open_count[i, j] > 1:
             if self.ann_ref[i][j] is None:
                 self.ann_ref[i][j] = self.ax[1].annotate(int(self.open_count[i, j]), (i + 0.5, j + 0.5),
-                                color="yellow", ha='center', va='center', fontsize=10,
-                                fontweight='bold')
+                                                         color="yellow", ha='center', va='center', fontsize=10,
+                                                         fontweight='bold')
             else:
                 self.ann_ref[i][j].set_text(int(self.open_count[i, j]))
         self.fig.canvas.draw()
-        plt.pause(0.2)
+        plt.pause(self.delay)
         # input()
 
     def show_belief(self, event):

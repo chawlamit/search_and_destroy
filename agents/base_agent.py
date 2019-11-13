@@ -8,7 +8,7 @@ import math
 import matplotlib.pyplot as plt
 
 class BaseAgent(ABC):
-    def __init__(self, env: Environment, visualize=False):
+    def __init__(self, env: Environment, visualize=False, delay=0.2):
         self.env = env
         self.search_count = 0
         self.travel_count = 0
@@ -20,7 +20,7 @@ class BaseAgent(ABC):
         # visualization
         self.visualize = visualize
         if visualize:
-            self.visualization = SearchAndDestroy(env, self._belief)
+            self.visualization = SearchAndDestroy(env, self._belief, delay)
             self.visualization.show()
 
     @abstractmethod

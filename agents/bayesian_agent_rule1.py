@@ -1,6 +1,8 @@
 from .base_agent import BaseAgent
 import random
 import numpy as np
+
+
 class BayesianAgentRule1(BaseAgent):
     """
     Using bayesian update to update the belief of Ta = Ci for every cell on board given the data we observed i.e. T != Ci
@@ -24,6 +26,11 @@ class BayesianAgentRule1(BaseAgent):
         self._belief[current_cell[0]][current_cell[1]] = posterior
 
     def pick_next(self, current=None):
+        """
+        Picks a cell with max belief of containing the target
+        :param current:
+        :return:
+        """
         max_belief_cells = []
         for i in range(self.env.dim):
             for j in range(self.env.dim):
@@ -41,9 +48,10 @@ class BayesianAgentRule1(BaseAgent):
             # self.show()
             current = self.pick_next(prev_cell)
             terrain = self.env.get_terrain(*current)
-            # print(f"current: {current}, terrain: {terrain}")
+            print(f"current: {current}, terrain: {terrain}")
 
             found = self.search(*current)
+
             if found:
                 break
 
@@ -63,4 +71,4 @@ class BayesianAgentRule1(BaseAgent):
             # Update the visualization matrix
             self.update_visualization(*current)
 
-
+            # input()
